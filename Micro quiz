@@ -1,4 +1,4 @@
-#define ANALOG_PIN 13
+#define ANALOG_PIN A0
 int reading;
 unsigned int t0,t1;
 float voltage, temp;
@@ -15,7 +15,7 @@ void loop() {
   t1=millis() - t0;
 
 // convert 10bit 1024 state ADC
-voltage = 5.0*reading/1030;
+voltage = 5.0*reading/1023;
 //spec sheet conversion of 10mV/C and accuracy starting at -50C
 temp = voltage*(1/0.01)-50.0;
 
