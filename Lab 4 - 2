@@ -1,0 +1,92 @@
+#include "Adafruit_Si7021.h"
+# include <DHT.h>
+Adafruit_Si7021 sensor = Adafruit_Si7021();
+int LEDpin = 13;
+int errorlight = 12;
+#define DHTTYPE1 DHT11
+#define DHTTYPE2 DHT11
+
+#define DHT_1_PIN 2
+#define DHT_2_PIN 4
+
+DHT dht_1(DHT_1_PIN, DHTTYPE1);
+DHT dht_2(DHT_2_PIN, DHTTYPE2);
+
+void setup() {
+  Serial.begin(115200);
+
+  // wait for serial port to open
+  while (!Serial) {
+    delay(10);
+  }
+
+  Serial.println("Si7021 test!");
+  
+  if (!sensor.begin()) {
+    Serial.println("Did not find Si7021 sensor!");
+    while (true)
+      ;
+  }
+
+  Serial.print("Found model ");
+  switch(sensor.getModel()) {
+    case SI_Engineering_Samples:
+      Serial.print("SI engineering samples"); break;
+    case SI_7013:
+      Serial.print("Si7013"); break;
+    case SI_7020:
+      Serial.print("Si7020"); break;
+    case SI_7021:
+      Serial.print("Si7021"); break;
+    case SI_UNKNOWN:
+    default:
+      Serial.print("Unknown");
+  }
+  Serial.print(" Rev(");
+  Serial.print(sensor.getRevision());
+  Serial.print(")");
+  Serial.print(" Serial #"); Serial.print(sensor.sernum_a, HEX); Serial.println(sensor.sernum_b, HEX);
+}
+
+void loop() {
+
+float H_1 = dht_1.readHumidity();
+ float T_1 = dht_1.readTemperature();
+
+float H_2 = dht_2.readHumidity();
+ float T_2 = dht_2.readTemperature();
+ 
+ T_1=1.8*T_1+32;
+ T_2=1.8*T_2+32;
+ 
+  Serial.print("Humidity Sensor 1:    ");
+  Serial.print(H_1);
+  Serial.print("\tTemperature sensor 1: ");
+  Serial.println(T_1);
+   Serial.print("Humidity Sensor 2:    ");
+  Serial.print(H_2);
+  Serial.print("\tTemperature sensor 2: ");
+  Serial.println(T_2);
+  delay(1000);
+  
+if (T_1=T_2)
+{
+  digitalWrite(errorlight, LOW);
+  
+  if (T_1<=98.0)
+  {
+digitalWrite(LEDpin, HIGH);   // turn the LED on (HIGH is the voltage level)
+  }
+  if (T_1>=100.0)
+  {
+    digitalWrite(LEDpin, LOW); 
+  }
+  }
+else 
+{
+
+digitalWrite(errorlight, HIGH);// turn the LED off by making the voltage LOW
+  Serial.print("Sensors do not match");
+}
+  
+}
