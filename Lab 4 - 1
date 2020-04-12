@@ -1,0 +1,63 @@
+#include "Adafruit_Si7021.h"
+
+Adafruit_Si7021 sensor = Adafruit_Si7021();
+int LEDpin = 13;
+void setup() {
+  Serial.begin(115200);
+
+  // wait for serial port to open
+  while (!Serial) {
+    delay(10);
+  }
+
+  Serial.println("Si7021 test!");
+  
+  if (!sensor.begin()) {
+    Serial.println("Did not find Si7021 sensor!");
+    while (true)
+      ;
+  }
+
+  Serial.print("Found model ");
+  switch(sensor.getModel()) {
+    case SI_Engineering_Samples:
+      Serial.print("SI engineering samples"); break;
+    case SI_7013:
+      Serial.print("Si7013"); break;
+    case SI_7020:
+      Serial.print("Si7020"); break;
+    case SI_7021:
+      Serial.print("Si7021"); break;
+    case SI_UNKNOWN:
+    default:
+      Serial.print("Unknown");
+  }
+  Serial.print(" Rev(");
+  Serial.print(sensor.getRevision());
+  Serial.print(")");
+  Serial.print(" Serial #"); Serial.print(sensor.sernum_a, HEX); Serial.println(sensor.sernum_b, HEX);
+}
+
+void loop() {
+
+float H = sensor.readHumidity();
+ float T = sensor.readTemperature();
+ T=1.8*T+32;
+  Serial.print("Humidity:    ");
+  Serial.print(H);
+  Serial.print("\tTemperature: ");
+  Serial.println(T);
+  delay(1000);
+  
+if (T<=83.0)
+{
+digitalWrite(LEDpin, HIGH);   // turn the LED on (HIGH is the voltage level)
+  
+}
+
+if (T>=84.4)
+digitalWrite(LEDpin, LOW);    // turn the LED off by making the voltage LOW
+  
+
+  
+}
