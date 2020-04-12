@@ -49,13 +49,13 @@ float H = sensor.readHumidity();
   Serial.println(T);
   delay(1000);
   
-if (T<=83.0)
+if (T<=98.0)
 {
 digitalWrite(LEDpin, HIGH);   // turn the LED on (HIGH is the voltage level)
   
 }
 
-if (T>=84.4)
+if (T>=100.0)
 digitalWrite(LEDpin, LOW);    // turn the LED off by making the voltage LOW
   
 
