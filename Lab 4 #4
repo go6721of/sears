@@ -1,0 +1,95 @@
+#include "Adafruit_Si7021.h"
+#include <LiquidCrystal.h>
+
+const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+float current_T=0;
+float lastreading=0; 
+int yellow = 6;
+int green = 5;
+unsigned int t0;
+
+Adafruit_Si7021 sensor = Adafruit_Si7021();
+int LEDpin = 13;
+void setup() {
+
+  pinMode (yellow, OUTPUT);
+  pinMode (green, OUTPUT);
+  
+  lcd.begin(16, 2);
+  t0 = millis();
+  
+  Serial.begin(115200);
+
+  // wait for serial port to open
+  while (!Serial) {
+    delay(10);
+  }
+
+  Serial.println("Si7021 test!");
+  
+  if (!sensor.begin()) {
+    Serial.println("Did not find Si7021 sensor!");
+    while (true)
+      ;
+  }
+
+  Serial.print("Found model ");
+  switch(sensor.getModel()) {
+    case SI_Engineering_Samples:
+      Serial.print("SI engineering samples"); break;
+    case SI_7013:
+      Serial.print("Si7013"); break;
+    case SI_7020:
+      Serial.print("Si7020"); break;
+    case SI_7021:
+      Serial.print("Si7021"); break;
+    case SI_UNKNOWN:
+    default:
+      Serial.print("Unknown");
+  }
+  Serial.print(" Rev(");
+  Serial.print(sensor.getRevision());
+  Serial.print(")");
+  Serial.print(" Serial #"); Serial.print(sensor.sernum_a, HEX); Serial.println(sensor.sernum_b, HEX);
+}
+
+void loop() {
+  
+
+
+ float H = sensor.readHumidity();
+ lastreading = current_T;
+ current_T = 1.8*(sensor.readTemperature())+32;
+
+  
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Humidity: ");
+  lcd.print(H);
+  lcd.print(" ");
+  
+  lcd.setCursor(0,1);
+ 
+  lcd.print("Temp: ");
+  lcd.print(current_T,2);
+  lcd.print("");
+ lcd.print((char) 223);
+  lcd.print("F");
+  lcd.print("");
+  delay(1000);
+
+  
+if ( fabs(current_T - lastreading)<=0.1)
+{ 
+  digitalWrite(green, LOW);
+digitalWrite(yellow, HIGH); 
+}
+else 
+{
+digitalWrite(green, HIGH);   // turn the LED on (HIGH is the voltage level)
+digitalWrite(yellow,LOW);
+}
+   
+}
