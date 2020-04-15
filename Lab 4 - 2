@@ -1,3 +1,6 @@
+//Source Code: https://www.circuitbasics.com/how-to-set-up-the-dht11-humidity-sensor-on-an-arduino/
+// Adafruit Si7021 library
+
 #include "Adafruit_Si7021.h"
 # include <DHT.h>
 Adafruit_Si7021 sensor = Adafruit_Si7021();
