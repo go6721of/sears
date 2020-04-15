@@ -69,7 +69,10 @@ float H_2 = dht_2.readHumidity();
   Serial.println(T_2);
   delay(1000);
   
-if (T_1=T_2)
+Float dT =fabs(T_1-T_2);
+Float close_enough_to_be_considered_equal =0.1;
+
+if(dT<close_enough_to_be_considered_equal)
 {
   digitalWrite(errorlight, LOW);
   
