@@ -1,0 +1,97 @@
+/*
+  Arduino LSM9DS1 - Simple Gyroscope
+
+  This example reads the gyroscope values from the LSM9DS1
+  sensor and continuously prints them to the Serial Monitor
+  or Serial Plotter.
+
+  The circuit:
+  - Arduino Nano 33 BLE Sense
+
+  created 10 Jul 2019
+  by Riccardo Rizzo
+
+  This example code is in the public domain.
+*/
+
+#include <Arduino_LSM9DS1.h>
+#include <LiquidCrystal.h>
+
+const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+int position_pin = 6;
+float t= millis()/1000;
+
+void setup() {
+  lcd.begin(16, 2);
+  
+  Serial.begin(9600);
+  while (!Serial);
+  Serial.println("Started");
+
+  if (!IMU.begin()) {
+    Serial.println("Failed to initialize IMU!");
+    while (1);
+  }
+  Serial.print("Gyroscope sample rate = ");
+  Serial.print(IMU.gyroscopeSampleRate());
+  Serial.println(" Hz");
+  Serial.println();
+  Serial.println("Gyroscope in degrees/second");
+  Serial.println("X\tY\tZ");
+}
+
+void loop() {
+
+  
+  float x, y, z;
+float delta_t=millis()/1000-t;
+float delta_x=0.5*x*(delta_t*delta_t);
+float delta_y=0.5*y*(delta_t*delta_t);
+float delta_z=0.5*z*(delta_t*delta_t);
+
+
+
+  if (IMU.gyroscopeAvailable()) {
+    IMU.readGyroscope(x, y, z);
+
+    Serial.print(x);
+    Serial.print('\t');
+    Serial.print(y);
+    Serial.print('\t');
+    Serial.println(z);
+delay(1000);
+   if (z>0.7)
+{
+  digitalWrite (position_pin,LOW);
+ }
+ if(z<0.0)
+ {
+  digitalWrite (position_pin,LOW);
+
+ }
+ else
+ {
+  digitalWrite(position_pin,HIGH);
+ }
+ 
+
+    
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("D x:");
+  lcd.print(delta_x);
+  lcd.print(" ");
+  lcd.print("D y:");
+  lcd.print(delta_y);
+  lcd.print(" ");
+   
+  lcd.setCursor(0,1);
+
+ lcd.print("D z: ");
+  lcd.print(delta_z);
+  lcd.print("");
+delay(1000);
+
+  }
+}
