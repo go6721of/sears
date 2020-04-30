@@ -20,11 +20,15 @@
 const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 int position_pin = 6;
-float t= millis()/1000;
+float t = millis() / 1000;
+float delta_t;
+float delta_x = 0, delta_y = 0, delta_z = 0;
+float vx = 0, vy = 0, vz = 0;
+float t_now,t_old;
 
 void setup() {
   lcd.begin(16, 2);
-  
+
   Serial.begin(9600);
   while (!Serial);
   Serial.println("Started");
@@ -33,50 +37,40 @@ void setup() {
     Serial.println("Failed to initialize IMU!");
     while (1);
   }
-  Serial.print("Gyroscope sample rate = ");
-  Serial.print(IMU.gyroscopeSampleRate());
-  Serial.println(" Hz");
-  Serial.println();
-  Serial.println("Gyroscope in degrees/second");
-  Serial.println("X\tY\tZ");
+  Serial.println("aX\taY\taZ");
 }
 
 void loop() {
 
+
+  float ax, ay, az;
+  if (IMU.accelerationAvailable()) {
+    IMU.readAcceleration(ax, ay, az);
+
+    float t_now = millis() / 1000.0;
+    Serial.print(ax);
+    Serial.print('\t');
+    Serial.print(ay);
+    Serial.print('\t');
+    Serial.println(az);
+  }
+  delta_t = t_now - t_old;
+
+  // update velocity
+  vx += ax * delta_t;
+  //vy += ...
+  //vz += ...
   
-  float x, y, z;
-float delta_t=millis()/1000-t;
-float delta_x=0.5*x*(delta_t*delta_t);
-float delta_y=0.5*y*(delta_t*delta_t);
-float delta_z=0.5*z*(delta_t*delta_t);
+  // update position
+  delta_x = 0.5 * ax * (delta_t*delta_t);
+  delta_y = 0.5 * ay * (delta_t*delta_t);
+  delta_z = 0.5 * az * (delta_t*delta_t);
+
+  t_old = t_now;
 
 
 
-  if (IMU.gyroscopeAvailable()) {
-    IMU.readGyroscope(x, y, z);
 
-    Serial.print(x);
-    Serial.print('\t');
-    Serial.print(y);
-    Serial.print('\t');
-    Serial.println(z);
-delay(1000);
-   if (z>0.7)
-{
-  digitalWrite (position_pin,LOW);
- }
- if(z<0.0)
- {
-  digitalWrite (position_pin,LOW);
-
- }
- else
- {
-  digitalWrite(position_pin,HIGH);
- }
- 
-
-    
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("D x:");
@@ -85,13 +79,12 @@ delay(1000);
   lcd.print("D y:");
   lcd.print(delta_y);
   lcd.print(" ");
-   
-  lcd.setCursor(0,1);
 
- lcd.print("D z: ");
+  lcd.setCursor(0, 1);
+
+  lcd.print("D z: ");
   lcd.print(delta_z);
   lcd.print("");
-delay(1000);
+  delay(1000);
 
-  }
 }
