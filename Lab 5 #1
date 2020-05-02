@@ -36,6 +36,9 @@ float az = 0;
 float ax_old = 0;
 float ay_old = 0;
 float az_old = 0;
+float delta_ax=0;
+float delta_ay=0;
+float delta_az=0;
 
 void setup() {
   lcd.begin(16, 2);
@@ -58,34 +61,31 @@ void loop() {
 
     t_now = millis();
     delta_t = (1.0/1000.0)*(float)(t_now - t_old);
-
-    Serial.print(delta_t);
-    // Serial.print('\t');
-    // Serial.print(ay);
-    //Serial.print('\t');
-    // Serial.println(az);
+    delta_ax=ax-ax_old;
+    delta_ay=ay-ay_old;
+    delta_az=az-az_old;
 
     // update velocity
-    vx += ax * delta_t;
-    vy += ay * delta_t;
-    vz += az * delta_t;
+    vx = delta_ax * delta_t;
+    vy = delta_ay * delta_t;
+    vz = delta_az * delta_t;
 
     // update position
-    delta_x = (0.5 * ax * (delta_t*delta_t)) + (vx * delta_t);
-    delta_y = (0.5 * ay * (delta_t*delta_t)) + (vy * delta_t);
-    delta_z = (0.5 * az * (delta_t*delta_t)) + (vz * delta_t);
+    delta_x = (0.5 * delta_ax * (delta_t*delta_t)) + (vx * delta_t);
+    delta_y = (0.5 * delta_ay * (delta_t*delta_t)) + (vy * delta_t);
+    delta_z = (0.5 * delta_az * (delta_t*delta_t)) + (vz * delta_t);
 
-    x = x + delta_x;
-    y = y + delta_y;
-    z = z + delta_z;
+    x = delta_x;
+    y = delta_y;
+    z = delta_z;
 
     t_old = t_now;
 
-    Serial.print(vx);
-    // Serial.print('\t');
-    // Serial.print(vy);
-    // Serial.print('\t');
-    // Serial.println(vz);
+    Serial.print(ax);
+    Serial.print('\t');
+    Serial.print(ay);
+    Serial.print('\t');
+    Serial.println(az);
 
 
     lcd.clear();
