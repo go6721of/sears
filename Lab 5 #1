@@ -21,11 +21,21 @@
 const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 int position_pin = 6;
-float t = millis();
+float t_now = millis();
 float delta_t;
 float delta_x = 0, delta_y = 0, delta_z = 0;
 float vx = 0, vy = 0, vz = 0;
-float t_now,t_old;
+float t_old=0;
+float x=0;
+float y=0;
+float z=0;
+  float ax=0; 
+  float ay=0;
+  float az=0;
+  
+  float ax_old=0;
+  float ay_old=0;
+  float az_old=0;
 
 void setup() {
   lcd.begin(16, 2);
@@ -44,16 +54,20 @@ void setup() {
 void loop() {
 
 
-  float ax, ay, az;
+
   if (IMU.accelerationAvailable()) {
     IMU.readAcceleration(ax, ay, az);
 
-    float t_now = millis();
-    Serial.print(ax);
-    Serial.print('\t');
-    Serial.print(ay);
-    Serial.print('\t');
-    Serial.println(az);
+   
+{
+  
+  
+    
+    Serial.print(delta_t);
+  // Serial.print('\t');
+   // Serial.print(ay);
+   //Serial.print('\t');
+   // Serial.println(az);
   }
   
  delta_t = t_now - t_old;
@@ -64,29 +78,44 @@ void loop() {
     vz += az * delta_t;
     
   // update position
-  delta_x = (0.5 * ax * (delta_t*delta_t))+(vx*delta_t);
-  delta_y = (0.5 * ay * (delta_t*delta_t))+(vy*delta_t);
-  delta_z = (0.5 * az * (delta_t*delta_t))+(vz*delta_t);
+  delta_x = (0.5 * ax * (delta_t*delta_t))+(vx);
+  delta_y = (0.5 * ay * (delta_t*delta_t))+(vy);
+  delta_z = (0.5 * az * (delta_t*delta_t))+(vz);
 
+ x=x+delta_x;
+ y=y+delta_y;
+ z=z+delta_z;
+ 
   t_old = t_now;
 
-
+Serial.print(vx);
+   // Serial.print('\t');
+   // Serial.print(vy);
+   // Serial.print('\t');
+   // Serial.println(vz);
 
 
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Dx:");
-  lcd.print(delta_x);
+  lcd.print(x);
   lcd.print(" ");
   lcd.print("Dy:");
-  lcd.print(delta_y);
+  lcd.print(y);
   lcd.print(" ");
 
   lcd.setCursor(0, 1);
 
   lcd.print("Dz: ");
-  lcd.print(delta_z);
+  lcd.print(z);
   lcd.print("");
+
+  ax=ax_old;
+  ay=ay_old;
+  az=az_old;
+  }
+  
   delay(1000);
+  
 
 }
