@@ -90,21 +90,24 @@ void loop() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Ax:");
-    lcd.print(delta_ax);
+    lcd.print(ax);
     lcd.print(" ");
     lcd.print("Ay:");
-    lcd.print(delta_ay);
+    lcd.print(ay);
     lcd.print(" ");
 
     lcd.setCursor(0, 1);
 
     lcd.print("Az: ");
-    lcd.print(delta_az);
+    lcd.print(az);
     lcd.print("");
 
     ax = ax_old;
     ay = ay_old;
     az = az_old;
+
+    
+    
   }
 
   delay(1000);
