@@ -1,0 +1,124 @@
+
+/*
+  Arduino LSM9DS1 - Simple Gyroscope
+
+  This example reads the gyroscope values from the LSM9DS1
+  sensor and continuously prints them to the Serial Monitor
+  or Serial Plotter.
+
+  The circuit:
+  - Arduino Nano 33 BLE Sense
+
+  created 10 Jul 2019
+  by Riccardo Rizzo
+
+  This example code is in the public domain.
+*/
+
+#include <Arduino_LSM9DS1.h>
+#include <LiquidCrystal.h>
+
+const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+int position_pin = 6;
+unsigned long t_now = millis();
+float delta_t;
+float delta_x = 0, delta_y = 0, delta_z = 0;
+float vx = 0, vy = 0, vz = 0;
+unsigned long t_old = 0;
+float x = 0;
+float y = 0;
+float z= 0;
+float x_old = 0;
+float y_old = 0;
+float z_old= 0;
+
+float ax = 0;
+float ay = 0;
+float az = 0;
+
+float ax_old = 0;
+float ay_old = 0;
+float az_old = 0;
+float delta_ax=0;
+float delta_ay=0;
+float delta_az=0;
+float slope=0;
+
+void setup() {
+  lcd.begin(16, 2);
+
+  Serial.begin(9600);
+  while (!Serial);
+  Serial.println("Started");
+
+  if (!IMU.begin()) {
+    Serial.println("Failed to initialize IMU!");
+    while (1);
+  }
+  Serial.println("aX\taY\taZ");
+}
+
+void loop() {
+
+  if (IMU.accelerationAvailable()) {
+    IMU.readAcceleration(ax, ay, az);
+
+    t_now = millis();
+    delta_t = (1.0/1000.0)*(float)(t_now - t_old);
+   
+
+    // update velocity
+    vx = ax * delta_t;
+    vy = ay * delta_t;
+    vz = az * delta_t;
+
+    // update position
+    x_old= (0.5 * delta_ax * (delta_t*delta_t)) + (vx * delta_t);
+    y_old= (0.5 * delta_ay * (delta_t*delta_t)) + (vy * delta_t);
+    z_old= (0.5 * delta_az * (delta_t*delta_t)) + (vz * delta_t);
+    
+
+    t_old = t_now;
+
+    vx = vx + ax*delta_t;
+    vy = vy + ay*delta_t;
+    vz = vz + az*delta_t;
+
+    slope=sqrt((x*x)+(z*z));
+
+    x=x+x_old;
+    y=y+y_old;
+    z=z+z_old;
+
+    Serial.print(x);
+    Serial.print('\t');
+    Serial.print(y);
+    Serial.print('\t');
+    Serial.println(z);
+    Serial.print('\t');
+    Serial.println(slope);
+
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Dx:");
+    lcd.print(x);
+    lcd.print(" ");
+    lcd.print("Dz:");
+    lcd.print(z);
+    lcd.print(" ");
+
+    lcd.setCursor(0, 1);
+
+    lcd.print("slope: ");
+    lcd.print(slope);
+    lcd.print("");
+
+  
+  }
+
+  delay(1000);
+
+
+}
